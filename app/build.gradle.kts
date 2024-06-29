@@ -15,9 +15,10 @@ dependencies {
     implementation(platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.13.11")
+    implementation("io.github.rybalkinsd:kohttp:0.12.0")
 }
 
 tasks.test {
