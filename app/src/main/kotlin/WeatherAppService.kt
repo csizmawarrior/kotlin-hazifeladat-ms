@@ -4,7 +4,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.ResponseBody
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,24 +11,22 @@ class WeatherAppService(val httpClient: OkHttpClient) {
 
     companion object {
         const val WEATHER_APP_ENDPOINT_HOST = "api.open-meteo.com"
-        const val WEATHER_APP_ENDPOINT_PATH = "/v1/forecast"
+        const val WEATHER_APP_ENDPOINT_PATH1 = "v1"
+        const val WEATHER_APP_ENDPOINT_PATH2 = "forecast"
     }
 
     fun collectDailyTemperatureData(): WeatherResultDto? {
         val resultBody = httpCall()
 
-        if (resultBody == null || resultBody.string().isBlank()) {
-            throw Exception("Nem sikerült a honlapról kinyerni a hőmérsékleti adatokat.")
-        }
-
-        return objectMapper.readValue(resultBody.string())
+        return objectMapper.readValue(resultBody)
     }
 
-    private fun httpCall(): ResponseBody? {
+    private fun httpCall(): String {
         val url = HttpUrl.Builder().host(WEATHER_APP_ENDPOINT_HOST)
             .port(443)
             .scheme("https")
-            .addPathSegment(WEATHER_APP_ENDPOINT_PATH)
+            .addPathSegment(WEATHER_APP_ENDPOINT_PATH1)
+            .addPathSegment(WEATHER_APP_ENDPOINT_PATH2)
             .addQueryParameter("latitude", "47.4984")
             .addQueryParameter("longitude", "19.0404")
             .addQueryParameter("hourly", "temperature_2m")
@@ -39,10 +36,11 @@ class WeatherAppService(val httpClient: OkHttpClient) {
             .get()
             .build()
         val response = httpClient.newCall(request).execute()
+        val responseBodyString = response.body?.string() ?: ""
 
-        if (response.code != 200) {
+        if (response.code != 200 || responseBodyString.isBlank()) {
             throw Exception("Nem sikerült a honlapról kinyerni a hőmérsékleti adatokat.")
         }
-        return response.body
+        return responseBodyString
     }
 }

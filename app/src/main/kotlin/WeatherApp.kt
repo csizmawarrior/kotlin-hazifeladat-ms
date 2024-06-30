@@ -5,11 +5,17 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import okhttp3.OkHttpClient
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @SpringBootApplication
-class WeatherApp
+class WeatherApp {
+    @Bean
+    fun httpClient(): OkHttpClient {
+        return OkHttpClient.Builder().build()
+    }
+}
 
 const val BEGINNING_TEXT = "Budapest napi középhőmérsékletének számítása a következő hét napra..."
 const val BEGINNING_CLARIFICATTION_TEXT =
@@ -24,27 +30,23 @@ fun main() {
     println(BEGINNING_TEXT)
 
     try {
-        dailyTemperatureCount()
+        val weatherAppService = WeatherAppService(OkHttpClient.Builder().build())
+        val weatherResult = weatherAppService.collectDailyTemperatureData()
+
+        calculateDailyTemperature(weatherResult!!).forEach { (day, calculatedResult) ->
+            println(
+                "$day napi középhőmérséklet: ${
+                    String.format(
+                        "%.3f",
+                        calculatedResult
+                    )
+                }${weatherResult.hourlyUnits.temperatureMeasurement}"
+            )
+        }
     } catch (e: Exception) {
         println("Hiba a napi középhőmérséklet számítása közben: ${e.localizedMessage}")
     }
 
-}
-
-private fun dailyTemperatureCount() {
-    val weatherAppService = WeatherAppService(OkHttpClient.Builder().build())
-    val weatherResult = weatherAppService.collectDailyTemperatureData()
-
-    calculateDailyTemperature(weatherResult!!).forEach { (day, calculatedResult) ->
-        println(
-            "$day napi középhőmérséklet: ${
-                String.format(
-                    "%.3f",
-                    calculatedResult
-                )
-            }${weatherResult.hourlyUnits.temperatureMeasurement}"
-        )
-    }
 }
 
 fun calculateDailyTemperature(weatherData: WeatherResultDto): MutableList<Pair<LocalDate, Double>> {

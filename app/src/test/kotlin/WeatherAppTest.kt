@@ -15,7 +15,7 @@ import kotlin.test.Test
 
 class WeatherAppTest {
 
-    val weatherAppService = WeatherAppService(httpClientMock)
+    private val weatherAppService = WeatherAppService(httpClientMock)
 
     companion object {
         val responseBody = mockk<ResponseBody>()
