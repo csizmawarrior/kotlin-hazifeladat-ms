@@ -61,10 +61,10 @@ fun calculateDailyTemperature(weatherData: WeatherResultDto): MutableList<Pair<L
 
     return days.map { day ->
         val dailyTemperatureList = timeList.filter {
-            day.isEqual(LocalDate.of(it.year, it.monthValue, it.dayOfMonth))
+            day == it.toLocalDate()
         }.toList()
         val calculatedForDay =
-            dailyTemperatureList.map { resultMap[it] ?: 0 }.sumOf { it.toDouble() }.div(dailyTemperatureList.size)
+            dailyTemperatureList.map { resultMap[it]!! }.sumOf { it.toDouble() }.div(dailyTemperatureList.size)
 
         day to calculatedForDay
     }.toMutableList()

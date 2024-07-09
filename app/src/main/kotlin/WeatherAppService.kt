@@ -36,9 +36,9 @@ class WeatherAppService(val httpClient: OkHttpClient) {
             .get()
             .build()
         val response = httpClient.newCall(request).execute()
-        val responseBodyString = response.body?.string() ?: ""
+        val responseBodyString = response.body?.string()
 
-        if (response.code != 200 || responseBodyString.isBlank()) {
+        if (response.code != 200 || responseBodyString.isNullOrBlank()) {
             throw Exception("Nem sikerült a honlapról kinyerni a hőmérsékleti adatokat.")
         }
         return responseBodyString
